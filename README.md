@@ -783,11 +783,12 @@ Special thanks to:
 - [ddarfantasy](https://github.com/ddarfantasy), [ThaUnknown](https://github.com/ThaUnknown) - Reported and debugged text misalignment caused by CSS framework font resets ([#91](https://github.com/panphora/overtype/issues/91))
 - [milen-yordanov](https://github.com/milen-yordanov) - Reported code block colors ignoring theme in preview mode ([#97](https://github.com/panphora/overtype/issues/97))
 - [asalimian](https://github.com/asalimian) - Reported spellcheck being disabled ([#98](https://github.com/panphora/overtype/issues/98))
-- [be5invis](https://github.com/be5invis) - Reported reinit() not propagating fontSize changes ([#108](https://github.com/panphora/overtype/issues/108))
+- [be5invis](https://github.com/be5invis) - Reported reinit() not propagating fontSize changes ([#108](https://github.com/panphora/overtype/issues/108)), suggested focus/blur callbacks ([#107](https://github.com/panphora/overtype/issues/107))
 - [Danny Vink](https://github.com/dannyvink) - Fixed task list overlay alignment with spaced checkbox markers ([#109](https://github.com/panphora/overtype/pull/109))
 - [yurivish](https://github.com/yurivish) - Reported fontFamily option not being applied ([#110](https://github.com/panphora/overtype/issues/110))
 - [phinnaeus](https://github.com/phinnaeus) - Diagnosed missing fontFamily wiring ([#110](https://github.com/panphora/overtype/issues/110))
 - [Tan Nhu](https://github.com/tnhu) - Fixed onChange feedback loop with async syntax highlighters ([#111](https://github.com/panphora/overtype/pull/111))
+- [pscanf](https://github.com/pscanf) - Re-exported markdown-actions for custom toolbar implementations ([#105](https://github.com/panphora/overtype/issues/105), [#106](https://github.com/panphora/overtype/pull/106))
 
 ### TypeScript & Framework Support
 - [merlinz01](https://github.com/merlinz01) - Contributed TypeScript declaration file ([#20](https://github.com/panphora/overtype/pull/20))
