@@ -473,26 +473,20 @@ export function generateStyles(options = {}) {
     .overtype-stats {
       height: 40px !important;
       padding: 0 20px !important;
-      background: #f8f9fa !important;
-      border-top: 1px solid #e0e0e0 !important;
+      background: var(--bg-secondary, #f8f9fa) !important;
+      border-top: 1px solid var(--border, #e0e0e0) !important;
       display: flex !important;
       justify-content: space-between !important;
       align-items: center !important;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
       font-size: 0.85rem !important;
-      color: #666 !important;
+      color: var(--text-secondary, #666) !important;
       flex-shrink: 0 !important; /* Don't shrink */
       z-index: 10001 !important; /* Above link tooltip */
       position: relative !important; /* Enable z-index */
     }
-    
-    /* Dark theme stats bar */
-    .overtype-container[data-theme="cave"] .overtype-stats {
-      background: var(--bg-secondary, #1D2D3E) !important;
-      border-top: 1px solid rgba(197, 221, 232, 0.1) !important;
-      color: var(--text, #c5dde8) !important;
-    }
-    
+
+
     .overtype-stats .overtype-stat {
       display: flex !important;
       align-items: center !important;
