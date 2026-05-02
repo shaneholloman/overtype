@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.7] - 2026-05-01
+
+### Changed
+- credit contributors for v2.3.6 and v2.3.7 fixes
+
+### Fixed
+- preserve user spacing around task list checkboxes
+- prevent onChange feedback loop with async syntax highlighters
+
+
+
 ## [2.3.6] - 2026-05-01
 
 ### Fixed
