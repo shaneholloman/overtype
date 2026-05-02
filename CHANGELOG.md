@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.6] - 2026-05-01
+
+### Fixed
+- apply custom theme colors to stats bar
+- restore native textarea placeholder wrapping
+- re-apply instance CSS vars on reinit
+- apply fontFamily option via CSS variable
+
+
+
 ## [2.3.5] - 2026-03-13
 
 ### Fixed
