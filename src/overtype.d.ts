@@ -160,7 +160,8 @@ export interface OverTypeConstructor {
   MarkdownParser: any;
   ShortcutsManager: any;
   init(target: string | Element | NodeList | Element[], options?: Options): OverTypeInstance[];
-  getInstance(element: Element): OverTypeInstance | null;
+  initFromData(target: string | Element | NodeList | Element[], defaults?: Options): OverTypeInstance[];
+  getInstance(target: string | Element | NodeList | Element[]): OverTypeInstance | null;
   destroyAll(): void;
   injectStyles(force?: boolean): void;
   setTheme(theme: string | Theme, customColors?: Partial<Theme['colors']>): void;

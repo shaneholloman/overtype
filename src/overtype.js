@@ -93,23 +93,9 @@ class OverType {
      * @returns {Array} Array of OverType instances
      */
     constructor(target, options = {}) {
-      // Convert target to array of elements
-      let elements;
-      
-      if (typeof target === 'string') {
-        elements = document.querySelectorAll(target);
-        if (elements.length === 0) {
-          throw new Error(`No elements found for selector: ${target}`);
-        }
-        elements = Array.from(elements);
-      } else if (target instanceof Element) {
-        elements = [target];
-      } else if (target instanceof NodeList) {
-        elements = Array.from(target);
-      } else if (Array.isArray(target)) {
-        elements = target;
-      } else {
-        throw new Error('Invalid target: must be selector string, Element, NodeList, or Array');
+      const elements = OverType._resolveTargets(target);
+      if (typeof target === 'string' && elements.length === 0) {
+        throw new Error(`No elements found for selector: ${target}`);
       }
 
       // Initialize all elements and return array
@@ -1554,9 +1540,9 @@ class OverType {
      * // HTML: <div class="editor" data-ot-toolbar="true" data-ot-theme="cave"></div>
      * OverType.initFromData('.editor', { fontSize: '14px' });
      */
-    static initFromData(selector, defaults = {}) {
-      const elements = document.querySelectorAll(selector);
-      return Array.from(elements).map(el => {
+    static initFromData(target, defaults = {}) {
+      const elements = OverType._resolveTargets(target);
+      return elements.map(el => {
         const options = { ...defaults };
 
         // Parse data-ot-* attributes (kebab-case to camelCase)
@@ -1573,6 +1559,35 @@ class OverType {
     }
 
     /**
+     * Normalize various target shapes to an array of Elements
+     * @private
+     * @param {string|Element|NodeList|Element[]} target
+     * @returns {Element[]}
+     */
+    static _resolveTargets(target) {
+      if (target == null) {
+        throw new Error('Invalid target: must be selector string, Element, NodeList, or Array');
+      }
+      if (typeof target === 'string') {
+        return Array.from(document.querySelectorAll(target));
+      }
+      if (target instanceof Element) {
+        return [target];
+      }
+      if (target instanceof NodeList) {
+        return Array.from(target);
+      }
+      if (Array.isArray(target)) {
+        return target;
+      }
+      // Array-like (e.g. jQuery objects expose numeric indices and length)
+      if (typeof target.length === 'number') {
+        return Array.from(target);
+      }
+      throw new Error('Invalid target: must be selector string, Element, NodeList, or Array');
+    }
+
+    /**
      * Parse a data attribute value to the appropriate type
      * @private
      */
@@ -1585,11 +1600,21 @@ class OverType {
     }
 
     /**
-     * Get instance from element
-     * @param {Element} element - DOM element
-     * @returns {OverType|null} OverType instance or null
+     * Get instance from a target. Accepts the same shapes as the constructor;
+     * for multi-element targets, returns the instance for the first matching
+     * element, or null if none.
+     * @param {string|Element|NodeList|Element[]} target
+     * @returns {OverType|null}
      */
-    static getInstance(element) {
+    static getInstance(target) {
+      let element;
+      if (target instanceof Element) {
+        element = target;
+      } else {
+        const elements = OverType._resolveTargets(target);
+        element = elements[0];
+      }
+      if (!element) return null;
       return element.overTypeInstance || OverType.instances.get(element) || null;
     }
 
