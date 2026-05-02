@@ -140,6 +140,8 @@ export interface Options {
   // Callbacks
   onChange?: (value: string, instance: OverTypeInstance) => void;
   onKeydown?: (event: KeyboardEvent, instance: OverTypeInstance) => void;
+  onFocus?: (event: FocusEvent, instance: OverTypeInstance) => void;
+  onBlur?: (event: FocusEvent, instance: OverTypeInstance) => void;
 }
 
 // Interface for constructor that returns array

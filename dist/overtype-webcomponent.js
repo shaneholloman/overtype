@@ -4907,6 +4907,8 @@ ${blockSuffix}` : suffix;
         onChange: null,
         onKeydown: null,
         onRender: null,
+        onFocus: null,
+        onBlur: null,
         // Features
         showActiveLineRaw: false,
         showStats: false,
@@ -5356,6 +5358,24 @@ ${blockSuffix}` : suffix;
     handleInput(event) {
       this.updatePreview();
       this._notifyChange();
+    }
+    /**
+     * Handle focus events
+     * @private
+     */
+    handleFocus(event) {
+      if (this.options.onFocus) {
+        this.options.onFocus(event, this);
+      }
+    }
+    /**
+     * Handle blur events
+     * @private
+     */
+    handleBlur(event) {
+      if (this.options.onBlur) {
+        this.options.onBlur(event, this);
+      }
     }
     /**
      * Handle keydown events
@@ -6113,6 +6133,22 @@ ${blockSuffix}` : suffix;
             instance.handleKeydown(e);
         }
       });
+      document.addEventListener("focus", (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
+          const wrapper = e.target.closest(".overtype-wrapper");
+          const instance = wrapper == null ? void 0 : wrapper._instance;
+          if (instance)
+            instance.handleFocus(e);
+        }
+      }, true);
+      document.addEventListener("blur", (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
+          const wrapper = e.target.closest(".overtype-wrapper");
+          const instance = wrapper == null ? void 0 : wrapper._instance;
+          if (instance)
+            instance.handleBlur(e);
+        }
+      }, true);
       document.addEventListener("scroll", (e) => {
         if (e.target && e.target.classList && e.target.classList.contains("overtype-input")) {
           const wrapper = e.target.closest(".overtype-wrapper");

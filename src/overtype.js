@@ -228,6 +228,8 @@ class OverType {
         onChange: null,
         onKeydown: null,
         onRender: null,
+        onFocus: null,
+        onBlur: null,
         
         // Features
         showActiveLineRaw: false,
@@ -811,6 +813,26 @@ class OverType {
     handleInput(event) {
       this.updatePreview();
       this._notifyChange();
+    }
+
+    /**
+     * Handle focus events
+     * @private
+     */
+    handleFocus(event) {
+      if (this.options.onFocus) {
+        this.options.onFocus(event, this);
+      }
+    }
+
+    /**
+     * Handle blur events
+     * @private
+     */
+    handleBlur(event) {
+      if (this.options.onBlur) {
+        this.options.onBlur(event, this);
+      }
     }
 
     /**
@@ -1776,6 +1798,24 @@ class OverType {
           if (instance) instance.handleKeydown(e);
         }
       });
+
+      // Focus event (capture: true because focus does not bubble)
+      document.addEventListener('focus', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('overtype-input')) {
+          const wrapper = e.target.closest('.overtype-wrapper');
+          const instance = wrapper?._instance;
+          if (instance) instance.handleFocus(e);
+        }
+      }, true);
+
+      // Blur event (capture: true because blur does not bubble)
+      document.addEventListener('blur', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('overtype-input')) {
+          const wrapper = e.target.closest('.overtype-wrapper');
+          const instance = wrapper?._instance;
+          if (instance) instance.handleBlur(e);
+        }
+      }, true);
 
       // Scroll event
       document.addEventListener('scroll', (e) => {
