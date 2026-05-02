@@ -314,6 +314,9 @@ class OverType {
       if (this.options.padding) {
         this.wrapper.style.setProperty('--instance-padding', this.options.padding);
       }
+      if (this.options.fontFamily) {
+        this.wrapper.style.setProperty('--instance-font-family', this.options.fontFamily);
+      }
 
       // Disable autofill, spellcheck, and extensions
       this._configureTextarea();
@@ -398,7 +401,10 @@ class OverType {
       if (this.options.padding) {
         this.wrapper.style.setProperty('--instance-padding', this.options.padding);
       }
-      
+      if (this.options.fontFamily) {
+        this.wrapper.style.setProperty('--instance-font-family', this.options.fontFamily);
+      }
+
       this.wrapper._instance = this;
 
       // Create textarea

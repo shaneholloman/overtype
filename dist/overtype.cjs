@@ -1132,9 +1132,9 @@ function generateStyles(options = {}) {
       left: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      
+
       /* Font properties - any difference breaks alignment */
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-variant-ligatures: none !important; /* keep metrics stable for code */
       font-size: var(--instance-font-size, ${fontSize}) !important;
       line-height: var(--instance-line-height, ${lineHeight}) !important;
@@ -1241,7 +1241,7 @@ function generateStyles(options = {}) {
       z-index: 0 !important;
       pointer-events: none !important;
       user-select: none !important;
-      font-family: ${fontFamily} !important;
+      font-family: var(--instance-font-family, ${fontFamily}) !important;
       font-size: var(--instance-font-size, ${fontSize}) !important;
       line-height: var(--instance-line-height, ${lineHeight}) !important;
       padding: var(--instance-padding, ${padding}) !important;
@@ -1402,7 +1402,7 @@ function generateStyles(options = {}) {
     .overtype-wrapper .overtype-preview pre code {
       background: transparent !important;
       color: var(--code, #0d3b66) !important;
-      font-family: ${fontFamily} !important; /* Match textarea font exactly for alignment */
+      font-family: var(--instance-font-family, ${fontFamily}) !important; /* Match textarea font exactly for alignment */
     }
 
     /* Blockquotes */
@@ -4860,6 +4860,9 @@ var _OverType = class _OverType {
     if (this.options.padding) {
       this.wrapper.style.setProperty("--instance-padding", this.options.padding);
     }
+    if (this.options.fontFamily) {
+      this.wrapper.style.setProperty("--instance-font-family", this.options.fontFamily);
+    }
     this._configureTextarea();
     this._applyOptions();
   }
@@ -4915,6 +4918,9 @@ var _OverType = class _OverType {
     }
     if (this.options.padding) {
       this.wrapper.style.setProperty("--instance-padding", this.options.padding);
+    }
+    if (this.options.fontFamily) {
+      this.wrapper.style.setProperty("--instance-font-family", this.options.fontFamily);
     }
     this.wrapper._instance = this;
     this.textarea = document.createElement("textarea");
