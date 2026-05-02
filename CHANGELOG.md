@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.8] - 2026-05-02
+
+### Added
+- Accept Element, NodeList, and Array inputs in initFromData and getInstance
+- onFocus and onBlur callbacks
+- Re-export markdownActions for custom toolbar implementations
+
+### Changed
+- Minify embedded CSS and SVG in built bundles
+
+
+
 ## [2.3.7] - 2026-05-01
 
 ### Changed
