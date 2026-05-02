@@ -189,7 +189,7 @@ class OverType {
 
       // Call onChange if provided
       if (this.options.onChange) {
-        this.options.onChange(this.getValue(), this);
+        this._notifyChange();
       }
     }
 
@@ -747,15 +747,19 @@ class OverType {
         this._updateStats();
       }
       
-      // Trigger onChange callback
-      if (this.options.onChange && this.initialized) {
-        this.options.onChange(text, this);
-      }
-
       // Trigger onRender callback
       if (this.options.onRender) {
         this.options.onRender(this.preview, isPreviewMode ? 'preview' : 'normal', this);
       }
+    }
+
+    /**
+     * Notify listeners that the editor value changed
+     * @private
+     */
+    _notifyChange() {
+      if (!this.options.onChange || !this.initialized) return;
+      this.options.onChange(this.textarea.value, this);
     }
 
     /**
@@ -806,6 +810,7 @@ class OverType {
      */
     handleInput(event) {
       this.updatePreview();
+      this._notifyChange();
     }
 
     /**
@@ -1059,12 +1064,17 @@ class OverType {
      * @param {string} value - Markdown content to set
      */
     setValue(value) {
+      const didChange = this.textarea.value !== value;
       this.textarea.value = value;
       this.updatePreview();
 
       // Update height if auto-resize is enabled
       if (this.options.autoResize) {
         this._updateAutoHeight();
+      }
+
+      if (didChange) {
+        this._notifyChange();
       }
     }
 

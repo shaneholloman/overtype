@@ -4741,7 +4741,7 @@ var _OverType = class _OverType {
     });
     this.initialized = true;
     if (this.options.onChange) {
-      this.options.onChange(this.getValue(), this);
+      this._notifyChange();
     }
   }
   /**
@@ -5181,12 +5181,18 @@ var _OverType = class _OverType {
     if (this.options.showStats && this.statsBar) {
       this._updateStats();
     }
-    if (this.options.onChange && this.initialized) {
-      this.options.onChange(text, this);
-    }
     if (this.options.onRender) {
       this.options.onRender(this.preview, isPreviewMode ? "preview" : "normal", this);
     }
+  }
+  /**
+   * Notify listeners that the editor value changed
+   * @private
+   */
+  _notifyChange() {
+    if (!this.options.onChange || !this.initialized)
+      return;
+    this.options.onChange(this.textarea.value, this);
   }
   /**
    * Apply background styling to code blocks
@@ -5221,6 +5227,7 @@ var _OverType = class _OverType {
    */
   handleInput(event) {
     this.updatePreview();
+    this._notifyChange();
   }
   /**
    * Handle keydown events
@@ -5401,10 +5408,14 @@ var _OverType = class _OverType {
    * @param {string} value - Markdown content to set
    */
   setValue(value) {
+    const didChange = this.textarea.value !== value;
     this.textarea.value = value;
     this.updatePreview();
     if (this.options.autoResize) {
       this._updateAutoHeight();
+    }
+    if (didChange) {
+      this._notifyChange();
     }
   }
   /**
