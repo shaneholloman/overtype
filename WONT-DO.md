@@ -20,6 +20,22 @@ These features could be considered if someone proposes a performant, elegant sol
 - Lightweight (< 10KB added)
 - Works with existing architecture
 
+### Autocompletion / Suggestion Popups
+**Why it's challenging:**
+- Needs to feel snappy on every keystroke; trigger detection runs in the input hot path
+- Trigger configuration (`@`, `#`, custom patterns) must not fight the host app's own input handling
+- Mobile keyboards and accessibility tools need deliberate behavior, not an afterthought
+- The visual/keyboard interaction model (open, navigate, select, dismiss) is non-trivial to get right
+
+**What we'd need:**
+- Opt-in API: disabled by default, host app supplies trigger pattern and suggestion source
+- Reuses the existing Floating UI positioning pattern that `LinkTooltip` uses
+- Hides on the same signals as `LinkTooltip` (cursor moves out of trigger context, scroll, blur)
+- Zero measurable typing impact when the feature is disabled
+- Negligible typing impact when enabled with no popup open
+- Plays well with native mobile autocorrect/suggestion bars
+- Keyboard navigation (↑↓/Enter/Esc) without breaking native textarea behavior elsewhere
+
 ---
 
 ## Will Not Implement
@@ -41,14 +57,6 @@ These features are fundamentally incompatible with OverType's design philosophy 
 - Would require significant architecture changes
 
 **Alternative:** Use formatted code blocks for simple ASCII tables.
-
-### 🚫 Auto-complete / IntelliSense
-**Why not:**
-- Popup menus break the overlay alignment
-- Conflicts with native mobile keyboards and accessibility tools
-- Goes against the "transparent textarea" philosophy
-
-**Alternative:** Use native browser/OS autocomplete and spell-check features.
 
 ### 🚫 Split Pane Preview
 **Why not:**
