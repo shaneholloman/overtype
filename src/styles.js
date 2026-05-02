@@ -236,9 +236,6 @@ export function generateStyles(options = {}) {
       padding: var(--instance-padding, ${padding}) !important;
       box-sizing: border-box !important;
       color: var(--placeholder, #999) !important;
-      overflow: hidden !important;
-      white-space: nowrap !important;
-      text-overflow: ellipsis !important;
     }
 
     /* Preview layer styles */
