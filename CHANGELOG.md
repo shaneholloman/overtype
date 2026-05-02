@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.9] - 2026-05-02
+
+### Fixed
+- Expose markdownActions on window for IIFE/script-tag builds
+
+
+
 ## [2.3.8] - 2026-05-02
 
 ### Added
