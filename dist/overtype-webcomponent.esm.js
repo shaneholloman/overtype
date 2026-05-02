@@ -7,6 +7,10 @@
  */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
@@ -1887,6 +1891,30 @@ function generateStyles(options = {}) {
 }
 
 // node_modules/markdown-actions/dist/markdown-actions.esm.js
+var markdown_actions_esm_exports = {};
+__export(markdown_actions_esm_exports, {
+  applyCustomFormat: () => applyCustomFormat,
+  default: () => src_default,
+  expandSelection: () => expandSelection2,
+  getActiveFormats: () => getActiveFormats2,
+  getDebugMode: () => getDebugMode,
+  hasFormat: () => hasFormat2,
+  insertHeader: () => insertHeader,
+  insertLink: () => insertLink,
+  preserveSelection: () => preserveSelection,
+  setDebugMode: () => setDebugMode,
+  setUndoMethod: () => setUndoMethod,
+  toggleBold: () => toggleBold,
+  toggleBulletList: () => toggleBulletList,
+  toggleCode: () => toggleCode,
+  toggleH1: () => toggleH1,
+  toggleH2: () => toggleH2,
+  toggleH3: () => toggleH3,
+  toggleItalic: () => toggleItalic,
+  toggleNumberedList: () => toggleNumberedList,
+  toggleQuote: () => toggleQuote,
+  toggleTaskList: () => toggleTaskList
+});
 var __defProp2 = Object.defineProperty;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
@@ -1973,6 +2001,9 @@ function mergeWithDefaults(format) {
   return __spreadValues(__spreadValues({}, getDefaultStyle()), format);
 }
 var debugMode = false;
+function setDebugMode(enabled) {
+  debugMode = enabled;
+}
 function getDebugMode() {
   return debugMode;
 }
@@ -2093,6 +2124,19 @@ function insertText(textarea, { text, selectionStart, selectionEnd }) {
     console.groupEnd();
   }
 }
+function setUndoMethod(method) {
+  switch (method) {
+    case "native":
+      canInsertText = true;
+      break;
+    case "manual":
+      canInsertText = false;
+      break;
+    case "auto":
+      canInsertText = null;
+      break;
+  }
+}
 function isMultipleLines(string) {
   return string.trim().split("\n").length > 1;
 }
@@ -2161,6 +2205,15 @@ function newlinesToSurroundSelectedText(textarea) {
     newlinesToPrepend = "\n".repeat(2 - newlinesAfterSelection);
   }
   return { newlinesToAppend, newlinesToPrepend };
+}
+function preserveSelection(textarea, callback) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const scrollTop = textarea.scrollTop;
+  callback();
+  textarea.selectionStart = start;
+  textarea.selectionEnd = end;
+  textarea.scrollTop = scrollTop;
 }
 function applyLineOperation(textarea, operation, options = {}) {
   const originalStart = textarea.selectionStart;
@@ -2535,6 +2588,43 @@ function getActiveFormats(textarea) {
   }
   return formats;
 }
+function hasFormat(textarea, format) {
+  const activeFormats = getActiveFormats(textarea);
+  return activeFormats.includes(format);
+}
+function expandSelection(textarea, options = {}) {
+  if (!textarea)
+    return;
+  const { toWord, toLine, toFormat } = options;
+  const { selectionStart, selectionEnd, value } = textarea;
+  if (toLine) {
+    const lines = value.split("\n");
+    let lineStart = 0;
+    let lineEnd = 0;
+    let currentPos = 0;
+    for (const line of lines) {
+      if (selectionStart >= currentPos && selectionStart <= currentPos + line.length) {
+        lineStart = currentPos;
+        lineEnd = currentPos + line.length;
+        break;
+      }
+      currentPos += line.length + 1;
+    }
+    textarea.selectionStart = lineStart;
+    textarea.selectionEnd = lineEnd;
+  } else if (toWord && selectionStart === selectionEnd) {
+    let start = selectionStart;
+    let end = selectionEnd;
+    while (start > 0 && !/\s/.test(value[start - 1])) {
+      start--;
+    }
+    while (end < value.length && !/\s/.test(value[end])) {
+      end++;
+    }
+    textarea.selectionStart = start;
+    textarea.selectionEnd = end;
+  }
+}
 function toggleBold(textarea) {
   if (!textarea || textarea.disabled || textarea.readOnly)
     return;
@@ -2728,6 +2818,51 @@ function toggleH3(textarea) {
 function getActiveFormats2(textarea) {
   return getActiveFormats(textarea);
 }
+function hasFormat2(textarea, format) {
+  return hasFormat(textarea, format);
+}
+function expandSelection2(textarea, options = {}) {
+  expandSelection(textarea, options);
+}
+function applyCustomFormat(textarea, format) {
+  if (!textarea || textarea.disabled || textarea.readOnly)
+    return;
+  const style = mergeWithDefaults(format);
+  let result;
+  if (style.multiline) {
+    const selectedText = textarea.value.slice(textarea.selectionStart, textarea.selectionEnd);
+    if (isMultipleLines(selectedText)) {
+      result = multilineStyle(textarea, style);
+    } else {
+      result = blockStyle(textarea, style);
+    }
+  } else {
+    result = blockStyle(textarea, style);
+  }
+  insertText(textarea, result);
+}
+var src_default = {
+  toggleBold,
+  toggleItalic,
+  toggleCode,
+  insertLink,
+  toggleBulletList,
+  toggleNumberedList,
+  toggleQuote,
+  toggleTaskList,
+  insertHeader,
+  toggleH1,
+  toggleH2,
+  toggleH3,
+  getActiveFormats: getActiveFormats2,
+  hasFormat: hasFormat2,
+  expandSelection: expandSelection2,
+  applyCustomFormat,
+  preserveSelection,
+  setUndoMethod,
+  setDebugMode,
+  getDebugMode
+};
 
 // src/toolbar.js
 var Toolbar = class {

@@ -1827,3 +1827,7 @@ export { OverType };
 
 // Export toolbar buttons for custom toolbar configurations
 export { toolbarButtons, defaultToolbarButtons } from './toolbar-buttons.js';
+
+// Re-export markdown-actions. Useful for custom toolbar implementations
+export * as markdownActions from 'markdown-actions';
+
