@@ -7,6 +7,121 @@ import { execSync } from 'child_process';
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 const version = packageJson.version;
 
+/**
+ * Minify the literal segments of template literals in styles.js / icons.js
+ * before bundling. ${...} interpolations are preserved as-is; only the text
+ * between them is collapsed and stripped of CSS comments. Cuts ~10KB off
+ * the bundle without affecting correctness because esbuild doesn't minify
+ * string content.
+ */
+function minifyTemplateLiteralsInJs(source) {
+  let out = '';
+  let i = 0;
+  const n = source.length;
+
+  const copyString = (quote) => {
+    out += source[i];
+    i++;
+    while (i < n && source[i] !== quote) {
+      if (source[i] === '\\' && i + 1 < n) {
+        out += source[i] + source[i + 1];
+        i += 2;
+      } else {
+        out += source[i];
+        i++;
+      }
+    }
+    if (i < n) { out += source[i]; i++; }
+  };
+
+  while (i < n) {
+    const c = source[i];
+    // Line comment
+    if (c === '/' && source[i + 1] === '/') {
+      const eol = source.indexOf('\n', i);
+      if (eol === -1) { out += source.substring(i); return out; }
+      out += source.substring(i, eol);
+      i = eol;
+      continue;
+    }
+    // Block comment
+    if (c === '/' && source[i + 1] === '*') {
+      const end = source.indexOf('*/', i);
+      if (end === -1) { out += source.substring(i); return out; }
+      out += source.substring(i, end + 2);
+      i = end + 2;
+      continue;
+    }
+    // Regular string
+    if (c === '"' || c === "'") { copyString(c); continue; }
+    // Template literal — minify literal segments, preserve ${...}
+    if (c === '`') {
+      out += '`';
+      i++;
+      let segment = '';
+      while (i < n && source[i] !== '`') {
+        if (source[i] === '\\' && i + 1 < n) {
+          segment += source[i] + source[i + 1];
+          i += 2;
+        } else if (source[i] === '$' && source[i + 1] === '{') {
+          out += minifyTemplateText(segment);
+          segment = '';
+          let depth = 1;
+          out += source[i] + source[i + 1];
+          i += 2;
+          while (i < n && depth > 0) {
+            if (source[i] === '{') depth++;
+            else if (source[i] === '}') depth--;
+            out += source[i];
+            i++;
+          }
+        } else {
+          segment += source[i];
+          i++;
+        }
+      }
+      out += minifyTemplateText(segment);
+      if (i < n) { out += '`'; i++; }
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  return out;
+}
+
+function minifyTemplateText(text) {
+  if (!text) return text;
+  const hasCssBlock = /\{[\s\S]*\}/.test(text) && /:[^;{}\n]+[;}]/.test(text);
+  const hasMarkup = /<[a-zA-Z]/.test(text);
+  if (hasCssBlock) {
+    return text
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s*([{};,])\s*/g, '$1')
+      .replace(/;}/g, '}')
+      .trim();
+  }
+  if (hasMarkup) {
+    return text
+      .replace(/\s+/g, ' ')
+      .replace(/>\s+</g, '><')
+      .replace(/\s+\/>/g, '/>')
+      .trim();
+  }
+  return text;
+}
+
+const minifyEmbeddedTemplatesPlugin = {
+  name: 'minify-embedded-templates',
+  setup(build) {
+    build.onLoad({ filter: /[\\/]src[\\/](styles|icons)\.js$/ }, async (args) => {
+      const src = await fs.promises.readFile(args.path, 'utf8');
+      return { contents: minifyTemplateLiteralsInJs(src), loader: 'js' };
+    });
+  }
+};
+
 // Banner for all builds
 const banner = `/**
  * OverType v${version}
@@ -87,6 +202,7 @@ async function build() {
         ...iifeBaseConfig,
         minify: true,
         sourcemap: false,
+        plugins: [minifyEmbeddedTemplatesPlugin]
       });
       console.log('✅ Built dist/overtype.min.js');
 
@@ -130,7 +246,8 @@ async function build() {
         globalName: 'OverTypeEditor',
         minify: true,
         sourcemap: false,
-        platform: 'browser'
+        platform: 'browser',
+        plugins: [minifyEmbeddedTemplatesPlugin]
       });
       console.log('✅ Built dist/overtype-webcomponent.min.js');
 
