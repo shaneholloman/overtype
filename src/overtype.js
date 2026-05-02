@@ -304,19 +304,7 @@ class OverType {
       // Store reference on wrapper
       this.wrapper._instance = this;
       
-      // Apply instance-specific styles via CSS custom properties
-      if (this.options.fontSize) {
-        this.wrapper.style.setProperty('--instance-font-size', this.options.fontSize);
-      }
-      if (this.options.lineHeight) {
-        this.wrapper.style.setProperty('--instance-line-height', String(this.options.lineHeight));
-      }
-      if (this.options.padding) {
-        this.wrapper.style.setProperty('--instance-padding', this.options.padding);
-      }
-      if (this.options.fontFamily) {
-        this.wrapper.style.setProperty('--instance-font-family', this.options.fontFamily);
-      }
+      this._applyInstanceCSSVars();
 
       // Disable autofill, spellcheck, and extensions
       this._configureTextarea();
@@ -391,19 +379,7 @@ class OverType {
       this.wrapper.className = 'overtype-wrapper';
       
       
-      // Apply instance-specific styles via CSS custom properties
-      if (this.options.fontSize) {
-        this.wrapper.style.setProperty('--instance-font-size', this.options.fontSize);
-      }
-      if (this.options.lineHeight) {
-        this.wrapper.style.setProperty('--instance-line-height', String(this.options.lineHeight));
-      }
-      if (this.options.padding) {
-        this.wrapper.style.setProperty('--instance-padding', this.options.padding);
-      }
-      if (this.options.fontFamily) {
-        this.wrapper.style.setProperty('--instance-font-family', this.options.fontFamily);
-      }
+      this._applyInstanceCSSVars();
 
       this.wrapper._instance = this;
 
@@ -555,10 +531,35 @@ class OverType {
     }
 
     /**
+     * Apply instance-specific styles via CSS custom properties on the wrapper.
+     * Called from init paths and from _applyOptions so reinit() propagates
+     * font/padding changes.
+     * @private
+     */
+    _applyInstanceCSSVars() {
+      if (!this.wrapper) return;
+      if (this.options.fontSize) {
+        this.wrapper.style.setProperty('--instance-font-size', this.options.fontSize);
+      }
+      if (this.options.lineHeight) {
+        this.wrapper.style.setProperty('--instance-line-height', String(this.options.lineHeight));
+      }
+      if (this.options.padding) {
+        this.wrapper.style.setProperty('--instance-padding', this.options.padding);
+      }
+      if (this.options.fontFamily) {
+        this.wrapper.style.setProperty('--instance-font-family', this.options.fontFamily);
+      }
+    }
+
+    /**
      * Apply options to the editor
      * @private
      */
     _applyOptions() {
+      // Re-apply instance-specific CSS vars so reinit() picks up font/padding changes
+      this._applyInstanceCSSVars();
+
       // Apply autofocus
       if (this.options.autofocus) {
         this.textarea.focus();

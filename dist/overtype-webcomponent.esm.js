@@ -4825,18 +4825,7 @@ var _OverType = class _OverType {
       return;
     }
     this.wrapper._instance = this;
-    if (this.options.fontSize) {
-      this.wrapper.style.setProperty("--instance-font-size", this.options.fontSize);
-    }
-    if (this.options.lineHeight) {
-      this.wrapper.style.setProperty("--instance-line-height", String(this.options.lineHeight));
-    }
-    if (this.options.padding) {
-      this.wrapper.style.setProperty("--instance-padding", this.options.padding);
-    }
-    if (this.options.fontFamily) {
-      this.wrapper.style.setProperty("--instance-font-family", this.options.fontFamily);
-    }
+    this._applyInstanceCSSVars();
     this._configureTextarea();
     this._applyOptions();
   }
@@ -4884,18 +4873,7 @@ var _OverType = class _OverType {
     }
     this.wrapper = document.createElement("div");
     this.wrapper.className = "overtype-wrapper";
-    if (this.options.fontSize) {
-      this.wrapper.style.setProperty("--instance-font-size", this.options.fontSize);
-    }
-    if (this.options.lineHeight) {
-      this.wrapper.style.setProperty("--instance-line-height", String(this.options.lineHeight));
-    }
-    if (this.options.padding) {
-      this.wrapper.style.setProperty("--instance-padding", this.options.padding);
-    }
-    if (this.options.fontFamily) {
-      this.wrapper.style.setProperty("--instance-font-family", this.options.fontFamily);
-    }
+    this._applyInstanceCSSVars();
     this.wrapper._instance = this;
     this.textarea = document.createElement("textarea");
     this.textarea.className = "overtype-input";
@@ -5010,10 +4988,33 @@ var _OverType = class _OverType {
     }
   }
   /**
+   * Apply instance-specific styles via CSS custom properties on the wrapper.
+   * Called from init paths and from _applyOptions so reinit() propagates
+   * font/padding changes.
+   * @private
+   */
+  _applyInstanceCSSVars() {
+    if (!this.wrapper)
+      return;
+    if (this.options.fontSize) {
+      this.wrapper.style.setProperty("--instance-font-size", this.options.fontSize);
+    }
+    if (this.options.lineHeight) {
+      this.wrapper.style.setProperty("--instance-line-height", String(this.options.lineHeight));
+    }
+    if (this.options.padding) {
+      this.wrapper.style.setProperty("--instance-padding", this.options.padding);
+    }
+    if (this.options.fontFamily) {
+      this.wrapper.style.setProperty("--instance-font-family", this.options.fontFamily);
+    }
+  }
+  /**
    * Apply options to the editor
    * @private
    */
   _applyOptions() {
+    this._applyInstanceCSSVars();
     if (this.options.autofocus) {
       this.textarea.focus();
     }
