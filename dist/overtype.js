@@ -5195,6 +5195,7 @@ ${blockSuffix}` : suffix;
         return;
       }
       this._fileUploadCounter = 0;
+      this._uploadedFiles = /* @__PURE__ */ new Map();
       this._boundHandleFilePaste = this._handleFilePaste.bind(this);
       this._boundHandleFileDrop = this._handleFileDrop.bind(this);
       this._boundHandleDragOver = this._handleDragOver.bind(this);
@@ -5202,6 +5203,53 @@ ${blockSuffix}` : suffix;
       this.textarea.addEventListener("drop", this._boundHandleFileDrop);
       this.textarea.addEventListener("dragover", this._boundHandleDragOver);
       this.fileUploadInitialized = true;
+    }
+    /**
+     * Extract URLs from markdown link syntax: [text](url) or ![text](url).
+     * @private
+     */
+    _extractMarkdownUrls(text) {
+      const urls = [];
+      const re = /!?\[[^\]]*\]\(([^)\s]+)/g;
+      let m;
+      while ((m = re.exec(text)) !== null)
+        urls.push(m[1]);
+      return urls;
+    }
+    /**
+     * Track URLs that were just inserted, pairing each with the source File.
+     * If multiple URLs appear in one inserted block, all get associated with
+     * the same file (rare; happens if onInsertFile returns several links).
+     * @private
+     */
+    _trackInsertedUrls(insertedText, file) {
+      if (!this._uploadedFiles || !file || !insertedText)
+        return;
+      for (const url of this._extractMarkdownUrls(insertedText)) {
+        this._uploadedFiles.set(url, { filename: file.name, file });
+      }
+    }
+    /**
+     * Diff the tracked-URL set against the current value and fire
+     * fileUpload.onRemoveFile for any URL no longer present.
+     * @private
+     */
+    _checkForRemovedUploads() {
+      var _a;
+      if (!this._uploadedFiles || this._uploadedFiles.size === 0)
+        return;
+      const cb = (_a = this.options.fileUpload) == null ? void 0 : _a.onRemoveFile;
+      const value = this.textarea.value;
+      const removed = [];
+      for (const [url, info] of this._uploadedFiles) {
+        if (!value.includes(url))
+          removed.push({ url, info });
+      }
+      for (const { url, info } of removed) {
+        this._uploadedFiles.delete(url);
+        if (cb)
+          cb({ url, filename: info.filename, file: info.file });
+      }
     }
     _handleFilePaste(e) {
       var _a, _b;
@@ -5235,6 +5283,7 @@ ${blockSuffix}` : suffix;
         }
         this.options.fileUpload.onInsertFile(file).then((text) => {
           this.textarea.value = this.textarea.value.replace(placeholder, text);
+          this._trackInsertedUrls(text, file);
           this.textarea.dispatchEvent(new Event("input", { bubbles: true }));
         }, (error) => {
           console.error("OverType: File upload failed", error);
@@ -5247,6 +5296,7 @@ ${blockSuffix}` : suffix;
           const texts = Array.isArray(result) ? result : [result];
           texts.forEach((text, index) => {
             this.textarea.value = this.textarea.value.replace(files[index].placeholder, text);
+            this._trackInsertedUrls(text, files[index].file);
           });
           this.textarea.dispatchEvent(new Event("input", { bubbles: true }));
         }, (error) => {
@@ -5268,6 +5318,7 @@ ${blockSuffix}` : suffix;
       this._boundHandleFilePaste = null;
       this._boundHandleFileDrop = null;
       this._boundHandleDragOver = null;
+      this._uploadedFiles = null;
       this.fileUploadInitialized = false;
     }
     insertAtCursor(text) {
@@ -5312,9 +5363,12 @@ ${blockSuffix}` : suffix;
      * @private
      */
     _notifyChange() {
-      if (!this.options.onChange || !this.initialized)
+      if (!this.initialized)
         return;
-      this.options.onChange(this.textarea.value, this);
+      this._checkForRemovedUploads();
+      if (this.options.onChange) {
+        this.options.onChange(this.textarea.value, this);
+      }
     }
     /**
      * Apply background styling to code blocks

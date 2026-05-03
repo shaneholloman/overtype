@@ -227,6 +227,7 @@ export interface Options {
     mimeTypes?: string[];
     batch?: boolean;
     onInsertFile: (file: File | File[]) => Promise<string | string[]>;
+    onRemoveFile?: (info: { url: string; filename: string; file: File }) => void;
   };
 
   // Callbacks

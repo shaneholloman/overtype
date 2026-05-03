@@ -116,6 +116,9 @@ Try uploading files to see them inserted as markdown links.
                     return isImage
                         ? `![${file.name}](${fakeUrl})`
                         : `[${file.name}](${fakeUrl})`;
+                },
+                onRemoveFile: ({ url, filename, file }) => {
+                    log(`Removed: ${filename} → ${url} (clean up backend file here)`);
                 }
             }
         });
